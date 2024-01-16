@@ -48,6 +48,8 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = ['https://ulearn.kexogg.ru', 'http://localhost']
+
 ROOT_URLCONF = 'ulearnProject.urls'
 
 TEMPLATES = [
