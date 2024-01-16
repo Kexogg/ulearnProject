@@ -1,4 +1,4 @@
 Django==5.0.1
 environs==10.3.0
 whitenoise==6.6.0
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
