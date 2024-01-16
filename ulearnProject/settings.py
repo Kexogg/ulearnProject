@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-=x*21sfl9yjs%$9-rhso$m3cl!5rmv*@2zczy+_959qi213$dj
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = ['ulearn.kexogg.ru']
+ALLOWED_HOSTS = ['ulearn.kexogg.ru', 'localhost']
 
 
 # Application definition
@@ -46,6 +46,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'ulearnProject.urls'
@@ -115,7 +116,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+
+# Extra places for collectstatic to find static files.
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+os.makedirs(STATIC_DIR, exist_ok=True)
+
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
