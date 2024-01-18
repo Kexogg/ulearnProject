@@ -1,9 +1,34 @@
+import requests_cache
+from datetime import datetime
+from django.http import HttpResponse
 from django.shortcuts import render
 
-from ulearnProject.models import Vacancy
-
-
 def latest(request):
-    vacancies = Vacancy.objects.order_by('-created_at')[:5].all()
-    print(vacancies)
-    return render(request, 'latest.html', {"vacancies": vacancies})
+    try:
+        session = requests_cache.CachedSession('hh_cache', expire_after=360)
+        info = session.get(
+            'https://api.hh.ru/vacancies?text=%22fullstack%22&specialization=1&per_page=10&order_by=publication_time&only_with_salary=true').json()
+        vacancies = {}
+        for index, vacancy in enumerate(info['items']):
+            vacancies[index] = clean_vacancy(session.get(f'https://api.hh.ru/vacancies/{vacancy["id"]}').json())
+        return render(request, 'latest.html',
+                      {'vacancies': vacancies.values()})
+    except Exception as e:
+        print(e)
+        return HttpResponse(status=500, content=f'Error: {e}')
+
+
+def clean_vacancy(vacancy):
+    if vacancy['salary']['from'] is not None and vacancy['salary']['to'] is not None and vacancy['salary']['from'] != \
+            vacancy['salary']['to']:
+        vacancy[
+            'salary'] = f"от {'{0:,}'.format(vacancy['salary']['from']).replace(',', ' ')} до {'{0:,}'.format(vacancy['salary']['to']).replace(',', ' ')} {vacancy['salary']['currency']}"
+    elif vacancy['salary']['from'] is not None:
+        vacancy[
+            'salary'] = f"{'{0:,}'.format(vacancy['salary']['from']).replace(',', ' ')} {vacancy['salary']['currency']}"
+    elif vacancy['salary']['to'] is not None:
+        vacancy[
+            'salary'] = f"{'{0:,}'.format(vacancy['salary']['to']).replace(',', ' ')} {vacancy['salary']['currency']}"
+    vacancy['published_at'] = datetime.strptime(vacancy['published_at'], '%Y-%m-%dT%H:%M:%S%z')
+    vacancy['key_skills'] = ', '.join([skill['name'] for skill in vacancy['key_skills']])
+    return vacancy

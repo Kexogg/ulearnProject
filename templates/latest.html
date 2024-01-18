@@ -7,17 +7,20 @@
 {% block content %}
     <h1>Последние вакансии</h1>
     {% for vacancy in vacancies %}
-        <div class="vacancy">
+        <article>
             <h2>{{ vacancy.name }}</h2>
-            <b>{{ vacancy.salary_from }} - {{ vacancy.salary_to }} {{ vacancy.salary_currency }}</b>
-            <p>Вакансия создана <time datetime="{{ vacancy.created_at.isoformat }}">{{ vacancy.created_at.year }}-{{ vacancy.created_at.month }}-{{ vacancy.created_at.day }}</time></p>
-            <p>Описание: {{ vacancy.description }}</p>
-            <p>Требуемые навыки:</p>
-            <ul>
-                {% for skill in vacancy.skills.all %}
-                    <li>{{ skill.name }}</li>
-                {% endfor %}
-            </ul>
-        </div>
+            <h3>{{ vacancy.salary }}</h3>
+            <b>Город: {{ vacancy.area.name }}</b>
+            <p>Работодатель: <a href="{{ vacancy.employer.url }}">{{ vacancy.employer.name }}</a></p>
+            <p>Вакансия создана
+                <time datetime="{{ vacancy.published_at.isoformat }}">{{ vacancy.published_at.day }}.{{ vacancy.published_at.month }}.{{ vacancy.published_at.year }}</time>
+            </p>
+            <article>
+                <h3>Описание</h3>
+                {{ vacancy.description|safe }}
+            </article>
+            <p>Требуемые навыки: {{ vacancy.key_skills }}</p>
+        </article>
+        <hr />
     {% endfor %}
 {% endblock %}
