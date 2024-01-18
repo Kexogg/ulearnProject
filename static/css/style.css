@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat&family=Red+Hat+Display:wght@300;400&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Red+Hat+Display:wght@300;400&display=swap');
 :root {
     --primary-color: steelblue;
     --secondary-color: #333;
@@ -13,11 +12,18 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Red Hat Display', sans-serif;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
 }
 
 a {
     text-decoration: none;
+    color: var(--secondary-color);
+}
+
+.link__highlight {
+    color: var(--accent-color);
+    text-decoration: underline;
 }
 
 header {
