@@ -21,7 +21,7 @@ import ulearnProject.views.home
 import ulearnProject.views.geography
 import ulearnProject.views.skills
 import ulearnProject.views.demand
-
+import ulearnProject.views.latest
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +29,5 @@ urlpatterns = [
     path('geography/', ulearnProject.views.geography.page),
     path('skills/', ulearnProject.views.skills.page),
     path('demand/', ulearnProject.views.demand.page),
+    path('latest/', ulearnProject.views.latest.page),
 ]

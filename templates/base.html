@@ -1,21 +1,48 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <title>{% block title %}Fullstack{% endblock %}</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header>
-        <!-- Header content goes here -->
-    </header>
+<header>
+    <div class="header__title">
+        <div>Fullstack</div>
+        <div>
+            <span>D</span>
+            <span>E</span>
+            <span>V</span>
+            <span>E</span>
+            <span>L</span>
+            <span>O</span>
+            <span>P</span>
+            <span>E</span>
+            <span>R</span>
+        </div>
+    </div>
+    <button id="header__menu">Меню</button>
+    <nav class="header__links">
+        <ul>
+            <li><a href="/">Главная</a></li>
+            <li><a href="/geography">География</a></li>
+            <li><a href="/skills/">Навыки</a></li>
+            <li><a href="/demand/">Востребованность</a></li>
+            <li><a href="/latest/">Новое</a></li>
+        </ul>
+    </nav>
+</header>
 
-    <main>
-        {% block content %}
-        <!-- Default content goes here -->
-        {% endblock %}
-    </main>
+<main>
+    {% block content %}
 
-    <footer>
-        <!-- Footer content goes here -->
-    </footer>
+    {% endblock %}
+</main>
+
+<footer>
+    Ulearn Django Project, 2024, Ulearn ID: a7e0331e-6472-4a83-9ff1-61063235392d
+</footer>
+<script src="{% static 'js/index.js' %}"></script>
 </body>
 </html>

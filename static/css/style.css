@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&family=Red+Hat+Display:wght@300;400&display=swap');
+
+:root {
+    --primary-color: steelblue;
+    --secondary-color: #333;
+    --accent-color: rgba(0, 144, 255, 1);
+    --text-color: #111;
+}
+
+body {
+    background: var(--primary-color);
+    font-family: 'Montserrat', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Red Hat Display', sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+header {
+    background: var(--secondary-color);
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.header__title {
+    display: block;
+    font-family: 'Red Hat Display', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.header__title > *:nth-child(2) {
+    display: flex;
+    font-size: 1rem;
+    font-weight: 300;
+    justify-content: space-between;
+}
+
+.header__links {
+    display: none;
+}
+
+.header__links > ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+}
+
+.header__links > ul > li > a {
+    display: block;
+}
+
+.header__links > ul > li > a, #header__menu {
+    color: white;
+    padding: 1rem;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 0 0 0 transparent inset;
+}
+
+.header__links > ul > li > a:hover, #header__menu.active {
+    box-shadow: 0 0 0 .2rem var(--accent-color) inset;
+}
+
+#header__menu {
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+
+@media screen and (max-width: 800px) {
+    .header__links.active {
+        display: flex;
+        width: 100%;
+    }
+
+    .header__links.active > ul {
+        flex-direction: column;
+        width: 100%;
+        align-items: start;
+    }
+}
+
+
+@media screen and (min-width: 800px) {
+    .header__links {
+        display: block;
+    }
+
+    #header__menu {
+        display: none;
+    }
+}
+
+
+main {
+    background: #fff;
+    color: var(--text-color);
+    padding: 10px;
+}
+
+
+footer {
+    background: var(--secondary-color);
+    color: #fff;
+    padding: 10px;
+}
