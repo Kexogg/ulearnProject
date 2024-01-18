@@ -5,5 +5,19 @@
 {% endblock %}
 
 {% block content %}
-    <p>Content</p>
+    <h1>Последние вакансии</h1>
+    {% for vacancy in vacancies %}
+        <div class="vacancy">
+            <h2>{{ vacancy.name }}</h2>
+            <b>{{ vacancy.salary_from }} - {{ vacancy.salary_to }} {{ vacancy.salary_currency }}</b>
+            <p>Вакансия создана <time datetime="{{ vacancy.created_at.isoformat }}">{{ vacancy.created_at.year }}-{{ vacancy.created_at.month }}-{{ vacancy.created_at.day }}</time></p>
+            <p>Описание: {{ vacancy.description }}</p>
+            <p>Требуемые навыки:</p>
+            <ul>
+                {% for skill in vacancy.skills.all %}
+                    <li>{{ skill.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
 {% endblock %}
