@@ -1,5 +1,5 @@
 from django.shortcuts import render
 
 
-def page(request):
+def geography(request):
     return render(request, 'geography.html', {})

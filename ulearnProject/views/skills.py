@@ -1,5 +1,5 @@
 from django.shortcuts import render
 
 
-def page(request):
+def skills(request):
     return render(request, 'skills.html', {})

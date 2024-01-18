@@ -25,9 +25,9 @@ import ulearnProject.views.latest
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', ulearnProject.views.home.page),
-    path('geography/', ulearnProject.views.geography.page),
-    path('skills/', ulearnProject.views.skills.page),
-    path('demand/', ulearnProject.views.demand.page),
-    path('latest/', ulearnProject.views.latest.page),
+    path('', ulearnProject.views.home.home),
+    path('geography/', ulearnProject.views.geography.geography),
+    path('skills/', ulearnProject.views.skills.skills),
+    path('demand/', ulearnProject.views.demand.demand),
+    path('latest/', ulearnProject.views.latest.latest),
 ]

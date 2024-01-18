@@ -1,5 +1,5 @@
 from django.shortcuts import render
 
 
-def page(request):
+def latest(request):
     return render(request, 'latest.html', {})
