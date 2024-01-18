@@ -26,6 +26,9 @@ class Vacancy(models.Model):
         verbose_name = 'Вакансия'
         verbose_name_plural = 'Вакансии'
 
+    def __str__(self):
+        return f'{self.name}, {self.area_name}'
+
 
 class VacancySkill(models.Model):
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
