@@ -7,7 +7,8 @@ def latest(request):
     try:
         session = requests_cache.CachedSession('hh_cache', expire_after=360)
         info = session.get(
-            'https://api.hh.ru/vacancies?text=%22fullstack%22&specialization=1&per_page=10&order_by=publication_time&only_with_salary=true').json()
+            'https://api.hh.ru/vacancies?text=%22fullstack%22&specialization=1&per_page=10&order_by=publication_time'
+            '&only_with_salary=true').json()
         vacancies = {}
         for index, vacancy in enumerate(info['items']):
             vacancies[index] = parse_vacancy(session.get(f'https://api.hh.ru/vacancies/{vacancy["id"]}').json())

@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  ulearn-project:
+    image: ghcr.io/kexogg/ulearnproject:main
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: db
+      DB_USER: dbuser
+      DB_NAME: mydb
+      DB_PASSWORD: mypassword
+      DJANGO_SECRET_KEY: mysecretkey
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dbuser
+      POSTGRES_DB: mydb
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - ./db:/var/lib/postgresql/data
