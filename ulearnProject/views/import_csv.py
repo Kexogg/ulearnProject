@@ -12,6 +12,7 @@ from django.shortcuts import redirect
 from ulearnProject import models
 from xml.etree import ElementTree as ET
 
+
 def process_row(row):
     if pd.isnull(row['salary_currency']) or (pd.isnull(row['salary_from']) and pd.isnull(row['salary_to'])):
         return None
@@ -32,25 +33,37 @@ def process_row(row):
     process_row.counter += 1
     return vacancy_object, skills
 
+
 process_row.counter = 0
+
+
+def process_chunk(chunk):
+    vacancies, skills = zip(*[process_row(row) for _, row in chunk.iterrows()])
+    vacancies = [v for v in vacancies if v is not None]
+    models.Vacancy.objects.bulk_create(vacancies)
+    vacancy_skills_list = []
+    for vacancy_object, vacancy_skills in zip(vacancies, skills):
+        skill_names = [skill.strip().lower() for skill in vacancy_skills]
+        existing_skills = models.Skill.objects.filter(name__in=skill_names)
+        existing_skill_names = [skill.name for skill in existing_skills]
+        new_skill_names = set(skill_names) - set(existing_skill_names)
+        new_skills = models.Skill.objects.bulk_create([models.Skill(name=name) for name in new_skill_names])
+        all_skills = list(existing_skills) + new_skills
+        for skill in all_skills:
+            vacancy_skills_list.append(models.VacancySkill(vacancy=vacancy_object, skill=skill))
+    models.VacancySkill.objects.bulk_create(vacancy_skills_list)
 
 
 def import_csv(request):
     if request.method == "POST":
         csv_file = request.FILES["csv_file"].read().decode("utf-8")
         data = pd.read_csv(io.StringIO(csv_file), low_memory=False)
+        chunk_size = 10000
+        chunks = [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
         with ThreadPoolExecutor() as executor:
             print("Processing", len(data), "vacancies with " + str(threading.active_count()) + " threads")
-            vacancies, skills = list(executor.map(process_row, data.iterrows()))
+            executor.map(process_chunk, chunks)
             print("Processed", process_row.counter, "rows.")
-        vacancies = [v for v in vacancies if v is not None]
-        print("Processed", len(vacancies), "vacancies. Saving...")
-        models.Vacancy.objects.bulk_create(vacancies)
-        print("Saved vacancies. Processing skills...")
-        for vacancy_object in vacancies:
-            skill_objects = [models.Skill.objects.get_or_create(name=skill.strip().lower())[0] for skill in skills]
-            vacancy_object.skills.set(skill_objects)
-
         return redirect("..")
     return HttpResponse("Invalid request method.")
 
