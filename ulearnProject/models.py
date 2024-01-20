@@ -13,13 +13,10 @@ class Skill(models.Model):
 
 
 class Vacancy(models.Model):
-    name = models.CharField('Название вакансии', max_length=100)
-    area_name = models.CharField('Город', max_length=100)
-    created_at = models.DateTimeField('Дата публикации', auto_now_add=True)
-    salary_from = models.DecimalField('Зарплата от', max_digits=10, decimal_places=0, null=True)
-    salary_to = models.DecimalField('Зарплата до', max_digits=10, decimal_places=0, null=True)
-    salary_currency = models.CharField('Валюта', max_length=3, null=True)
-    description = models.TextField('Описание вакансии', null=True)
+    name = models.CharField('Название вакансии', max_length=200)
+    area_name = models.CharField('Город', max_length=200)
+    published_at = models.DateTimeField('Дата публикации', auto_now_add=True)
+    salary = models.DecimalField('Зарплата', max_digits=10, decimal_places=0, null=True)
     skills = models.ManyToManyField("Skill", through="VacancySkill")
 
     class Meta:

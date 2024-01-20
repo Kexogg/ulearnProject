@@ -22,8 +22,10 @@ import ulearnProject.views.geography
 import ulearnProject.views.skills
 import ulearnProject.views.demand
 import ulearnProject.views.latest
+import ulearnProject.views.import_csv
 
 urlpatterns = [
+    path('admin/import_csv/', ulearnProject.views.import_csv.import_csv, name='ulearnProject_vacancy_import_csv'),
     path('admin/', admin.site.urls),
     path('', ulearnProject.views.home.home),
     path('geography/', ulearnProject.views.geography.geography),

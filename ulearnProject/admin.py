@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django import forms
+from django.urls import path
+
 from ulearnProject import models
+from ulearnProject.views.import_csv import import_csv
 
 
 class VacancyForm(forms.ModelForm):
@@ -22,3 +25,7 @@ class VacancyAdmin(admin.ModelAdmin):
 
 admin.site.register(models.Vacancy, VacancyAdmin)
 admin.site.register(models.Skill)
+
+urlpatterns = [
+    path('admin/import_csv/', import_csv, name='import_csv'),
+]
