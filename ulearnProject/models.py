@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Skill(models.Model):
-    name = models.CharField('Название навыка', max_length=100)
+    name = models.CharField('Название навыка', max_length=100, unique=True)
 
     class Meta:
         verbose_name = 'Навык'
@@ -13,9 +13,9 @@ class Skill(models.Model):
 
 
 class Vacancy(models.Model):
-    name = models.CharField('Название вакансии', max_length=200)
+    name = models.CharField('Название вакансии', max_length=500)
     area_name = models.CharField('Город', max_length=200)
-    published_at = models.DateTimeField('Дата публикации', auto_now_add=True)
+    published_at = models.DateTimeField('Дата публикации')
     salary = models.DecimalField('Зарплата', max_digits=10, decimal_places=0, null=True)
     skills = models.ManyToManyField("Skill", through="VacancySkill")
 
