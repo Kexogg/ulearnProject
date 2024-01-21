@@ -14,8 +14,8 @@ class Skill(models.Model):
 
 class Vacancy(models.Model):
     name = models.CharField('Название вакансии', max_length=500)
-    area_name = models.CharField('Город', max_length=200)
-    published_at = models.DateTimeField('Дата публикации')
+    area_name = models.CharField('Город', max_length=200, null=True)
+    published_at = models.DateTimeField('Дата публикации', null=True)
     salary = models.DecimalField('Зарплата', max_digits=10, decimal_places=0, null=True)
     skills = models.ManyToManyField("Skill", through="VacancySkill")
 

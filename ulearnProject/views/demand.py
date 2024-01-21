@@ -31,7 +31,7 @@ def get_graph(vacancies):
                label='Fullstack вакансии')
     axs[1].set_xticks(i + width / 2)
     axs[1].set_xticklabels(vacancies.values_list('year', flat=True), rotation=45)
-    axs[1].legend(fontsize=12)
+    axs[1].legend(fontsize=12, loc='upper left')
     axs[1].set_ylabel('Средняя зарплата')
     axs[1].set_title('Средняя зарплата по годам')
     imgdata = StringIO()

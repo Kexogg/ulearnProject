@@ -18,22 +18,23 @@ if os.name != 'nt':
 
 
 def process_row(row):
-    #if all(word not in row['name'].lower() for word in ['fullstack', 'фулстак', 'фуллтак', 'фуллстэк', 'фулстэк', 'full stack']):
-    #    return None
     if pd.isnull(row['salary_currency']) or (pd.isnull(row['salary_from']) and pd.isnull(row['salary_to'])) or \
             (pd.isnull(row['published_at'])):
-        return None
-    if not pd.isnull(row['salary_from']) and not pd.isnull(row['salary_to']):
-        row['salary'] = (row['salary_from'] + row['salary_to']) / 2
-    elif not pd.isnull(row['salary_from']):
-        row['salary'] = row['salary_from']
+        row['salary'] = None
     else:
-        row['salary'] = row['salary_to']
-    if row['salary_currency'] != 'RUR':
-        row['salary'] = row['salary'] * get_cbrf_rate(row['salary_currency'],
-                                                      datetime.strptime(row['published_at'],
-                                                                        '%Y-%m-%dT%H'
-                                                                        ':%M:%S%z'))
+        if not pd.isnull(row['salary_from']) and not pd.isnull(row['salary_to']):
+            row['salary'] = (row['salary_from'] + row['salary_to']) / 2
+        elif not pd.isnull(row['salary_from']):
+            row['salary'] = row['salary_from']
+        else:
+            row['salary'] = row['salary_to']
+        if row['salary_currency'] != 'RUR':
+            rate = get_cbrf_rate(row['salary_currency'], datetime.strptime(row['published_at'],
+                                                                           '%Y-%m-%dT%H:%M:%S%z'))
+            if rate is None:
+                row['salary'] = None
+            else:
+                row['salary'] = row['salary'] * rate
     vacancy_object = models.Vacancy(name=row['name'], area_name=row['area_name'],
                                     salary=row['salary'], published_at=row['published_at'])
     skills = [skill.strip() for skill in re.split(",|\n", str(row['key_skills']))]
@@ -86,5 +87,5 @@ def get_cbrf_rate(currency, date):
     for node in tree.findall('Valute'):
         if node.find('CharCode').text == currency:
             return float(node.find('VunitRate').text.replace(',', '.'))
-
-    raise ValueError(f'Currency {currency} not found. Date: {date}')
+    return None
+    #raise ValueError(f'Currency {currency} not found. Date: {date}')
