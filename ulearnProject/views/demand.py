@@ -13,24 +13,24 @@ from ulearnProject.models import Vacancy
 
 def get_graph(vacancies):
     width = 0.35
-
     fig, axs = plt.subplots(2)
     fig.subplots_adjust(hspace=0.5)
     fig.set_figwidth(10)
-    i = np.arange(len(vacancies.values_list('year', flat=True)))
-    axs[0].bar(i + width / 2, vacancies.values_list('count', flat=True), width, label='Все вакансии')
-    axs[0].bar(i - width / 2, vacancies.values_list('count_fullstack', flat=True), width, label='Fullstack вакансии')
+    i = np.arange(len(vacancies))
+    values_list = vacancies.values_list('year', 'count', 'count_fullstack', 'avg_salary', 'avg_salary_fullstack')
+    years, counts, counts_fullstack, avg_salaries, avg_salaries_fullstack = zip(*values_list)
+    axs[0].bar(i + width / 2, counts, width, label='Все вакансии')
+    axs[0].bar(i - width / 2, counts_fullstack, width, label='Fullstack вакансии')
     axs[0].set_xticks(i + width / 2)
-    axs[0].set_xticklabels(vacancies.values_list('year', flat=True), rotation=45)
+    axs[0].set_xticklabels(years, rotation=45)
     axs[0].legend(fontsize=12)
     axs[0].set_ylabel('Количество вакансий')
     axs[0].set_title('Вакансии по годам')
 
-    axs[1].bar(i + width / 2, vacancies.values_list('avg_salary', flat=True), width, label='Все вакансии')
-    axs[1].bar(i - width / 2, vacancies.values_list('avg_salary_fullstack', flat=True), width,
-               label='Fullstack вакансии')
+    axs[1].bar(i + width / 2, avg_salaries, width, label='Все вакансии')
+    axs[1].bar(i - width / 2, avg_salaries_fullstack, width, label='Fullstack вакансии')
     axs[1].set_xticks(i + width / 2)
-    axs[1].set_xticklabels(vacancies.values_list('year', flat=True), rotation=45)
+    axs[1].set_xticklabels(years, rotation=45)
     axs[1].legend(fontsize=12, loc='upper left')
     axs[1].set_ylabel('Средняя зарплата')
     axs[1].set_title('Средняя зарплата по годам')
