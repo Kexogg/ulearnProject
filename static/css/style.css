@@ -114,8 +114,41 @@ main {
     background: #fff;
     color: var(--text-color);
     padding: 10px;
+    overflow-x: hidden;
 }
 
+
+.table__container {
+    width: 100%;
+    overflow: scroll;
+}
+.table {
+    border-collapse: collapse;
+}
+.table > thead > tr > th, .table > tbody > tr > td {
+    padding: .25rem;
+    border: 1px solid #ccc;
+}
+.table > thead > tr > th {
+    background: var(--secondary-color);
+    color: #fff;
+    text-align: left;
+}
+.table > tbody > tr:nth-child(even) {
+    background: #f9f9f9;
+}
+.table > tbody > tr:hover {
+    background: #f1f1f1;
+}
+.chart__container {
+    width: 100%;
+    height: 400px;
+    margin: 0 auto;
+}
+.chart__container > svg {
+    width: 100%;
+    height: 100%;
+}
 
 footer {
     background: var(--secondary-color);

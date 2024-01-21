@@ -18,8 +18,8 @@ if os.name != 'nt':
 
 
 def process_row(row):
-    if all(word not in row['name'].lower() for word in ['fullstack', 'фулстак', 'фуллтак', 'фуллстэк', 'фулстэк', 'full stack']):
-        return None
+    #if all(word not in row['name'].lower() for word in ['fullstack', 'фулстак', 'фуллтак', 'фуллстэк', 'фулстэк', 'full stack']):
+    #    return None
     if pd.isnull(row['salary_currency']) or (pd.isnull(row['salary_from']) and pd.isnull(row['salary_to'])) or \
             (pd.isnull(row['published_at'])):
         return None
