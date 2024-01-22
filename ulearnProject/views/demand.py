@@ -83,7 +83,7 @@ def get_data():
     return vacancies
 
 
-@cache_page(60 * 15)
+@cache_page(60 * 60 * 24)
 def demand(request):
     vacancies = get_data()
     graph = get_graph(vacancies)

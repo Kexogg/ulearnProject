@@ -10,7 +10,7 @@
         <article>
             <h2><a href="{{ vacancy.alternate_url }}">{{ vacancy.name }}</a></h2>
             <h3>{{ vacancy.salary }}</h3>
-            <b>Город: {{ vacancy.area.name }}</b>
+            <b>Регион: {{ vacancy.area.name }}</b>
             <p>Работодатель: <a class="link__highlight" href="{{ vacancy.employer.alternate_url }}">{{ vacancy.employer.name }}</a></p>
             <p>Вакансия создана
                 <time datetime="{{ vacancy.published_at.isoformat }}">{{ vacancy.published_at.day }}.{{ vacancy.published_at.month }}.{{ vacancy.published_at.year }}</time>

@@ -95,7 +95,7 @@ def get_data():
     return vacancies, vacancies_fullstack
 
 
-@cache_page(60 * 15)
+@cache_page(60 * 60 * 24)
 def geography(request):
     vacancies, vacancies_fullstack = get_data()
     graph = get_graph(vacancies, vacancies_fullstack)
