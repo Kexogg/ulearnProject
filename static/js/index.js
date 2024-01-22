@@ -16,7 +16,7 @@ for (const accordion of accordions) {
     for (const item of items) {
         item.querySelector('.accordion__item__header').addEventListener('click', () => {
             item.classList.toggle('hidden');
-
+            item.querySelector('.accordion__button').textContent = item.classList.contains('hidden') ? 'Развернуть' : 'Свернуть';
         });
     }
 }
