@@ -50,22 +50,26 @@
                                 {{ accordionItem.content|safe }}
                             </div>
                         {% elif accordionItem.type == 'table' %}
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>Навык</th>
-                                    <th>Количество</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for key, value in accordionItem.content.items %}
+                            <div class="table__container">
+                                <table class="table">
+                                    <thead>
                                     <tr>
-                                        <td>{{ key }}</td>
-                                        <td>{{ value }}</td>
+                                        {% for columnKey, columnValue in accordionItem.columns.items %}
+                                            <th>{{ columnValue }}</th>
+                                        {% endfor %}
                                     </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {% for value in accordionItem.content %}
+                                        <tr>
+                                            {% for columnKey, columnValue in accordionItem.columns.items %}
+                                                <td>{{ value|get_item:columnKey|default:'Нет данных' }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         {% endif %}
                     </div>
                 </div>

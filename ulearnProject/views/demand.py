@@ -42,9 +42,10 @@ def get_graph(vacancies):
     data = imgdata.getvalue()
     return data
 
+
 @lru_cache(maxsize=None)
 def get_data():
-    vacancies = Vacancy.objects.annotate(
+    years = Vacancy.objects.annotate(
         year=ExtractYear('published_at')
     ).values('year').annotate(
         count=models.Count('id'),
@@ -78,13 +79,44 @@ def get_data():
                 default=None,
                 output_field=IntegerField()
             )
-        )
+        ),
     ).exclude(salary__gt=10000000).order_by('year')
-    return vacancies
+    return years
 
 
 @cache_page(60 * 60 * 24)
 def demand(request):
-    vacancies = get_data()
-    graph = get_graph(vacancies)
-    return render(request, 'demand.html', {'graph': graph, 'vacancies': vacancies})
+    years = get_data()
+    # return render(request, 'demand.html', {'graph': graph, 'vacancies': vacancies})
+    content = [
+        {'year': year['year'], 'count': year['count'],
+         'fraction_fullstack': str(round(year['count_fullstack'] / year['count'] * 100, 2)) + '%',
+         'avg_salary':  round(year['avg_salary'], 2),
+         'avg_salary_fullstack': round(year['avg_salary_fullstack'], 2) if year['avg_salary_fullstack'] else None,
+         'count_fullstack': year['count_fullstack'],
+         } for year in years
+    ]
+    return render(request, 'stats.html',
+                  {
+                      "accordions":
+                          {
+                              "Общая география вакансий":
+                                  [
+                                      {
+                                          'title': 'Таблица',
+                                          'columns': {'count': 'Количество', 'fraction': 'Доля',
+                                                      'avg_salary': 'Средняя зарплата (₽)',
+                                                      'count_fullstack': 'Количество Fullstack',
+                                                      'fraction_fullstack': 'Доля Fullstack',
+                                                      'avg_salary_fullstack': 'Средняя зарплата Fullstack (₽)'},
+                                          'type': 'table',
+                                          'content': content
+                                      },
+                                      {
+                                          'title': 'График',
+                                          'type': 'chart',
+                                          'content': get_graph(years)
+                                      },
+                                  ],
+                          }
+                  })

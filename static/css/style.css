@@ -5,6 +5,7 @@
     --secondary-color: #333;
     --accent-color: rgba(0, 144, 255, 1);
     --text-color: #111;
+    --border-color: rgba(100, 100, 100, 50);
 }
 
 body {
@@ -179,13 +180,14 @@ main {
     gap: 1rem;
     padding: 1rem;
 }
+
 .table__grid > * {
     width: 100%;
 }
 
 .chart__container {
     width: 100%;
-    height: 1500px;
+    max-height: 1500px;
     margin: 0 auto;
 }
 
@@ -194,10 +196,16 @@ main {
     height: 100%;
 }
 
+.accordion {
+    border: var(--border-color) solid 1px;
+    border-radius: .5rem;
+}
+
 .accordion__item > .accordion__item__header {
     display: flex;
     padding: 0.5rem;
 }
+
 .accordion__item > .accordion__item__header:hover {
     background: rgba(0, 0, 0, 0.05);
 }
@@ -216,14 +224,25 @@ main {
     cursor: pointer;
 }
 
+.accordion__item__content > * {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
 .accordion__item > .accordion__item__content {
     max-height: 10000px;
     transition: max-height 0.2s ease-in-out;
     overflow: hidden;
+    border-bottom: #cccccc solid 1px;
 }
 
 .accordion__item.hidden > .accordion__item__content {
     max-height: 0;
+    border-bottom: none;
+}
+
+.accordion__item:not(:last-child) > .accordion__item__header, .accordion__item:not(.hidden) > .accordion__item__header {
+    border-bottom: #cccccc solid 1px;
 }
 
 

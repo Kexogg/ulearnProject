@@ -86,7 +86,7 @@ def get_data():
 @cache_page(60 * 60 * 24)
 def skills(request):
     skills, skills_fullstack = get_data()
-    return render(request, 'skills.html',
+    return render(request, 'stats.html',
                   {
                       "accordions":
                           {
@@ -110,7 +110,7 @@ def skills(request):
                                           'title': 'Таблицы',
                                           'columns': {'title': 'Навык', 'count': 'Количество'},
                                           'type': 'table_grid',
-                                          'content': {year: [[{'title': k, 'count': v} for k, v in skills[year].items()]] for year in skills}
+                                          'content': {year: [[{'title': k, 'count': v} for k, v in skills[year].items()]] for year in skills_fullstack}
                                       },
                                       {
                                           'title': 'График',

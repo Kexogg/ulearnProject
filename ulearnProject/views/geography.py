@@ -11,57 +11,37 @@ from django.views.decorators.cache import cache_page
 from ulearnProject.models import Vacancy
 
 
-def get_graph(vacancies, vacancies_fullstack):
+@lru_cache(maxsize=None)
+def get_graph(vacancies):
     width = 0.35
-    fig, axs = plt.subplots(2, 2)
-    fig.set_figwidth(13)
+    fig, axs = plt.subplots(2)
+    fig.set_figwidth(10)
     fig.set_figheight(10)
     fig.subplots_adjust(hspace=0.5)
+    # fig.subplots_adjust(wspace=0.5)
     i = np.arange(10)
     avg_salary, area_name = zip(
         *vacancies.values_list('avg_salary', 'area_name').exclude(salary__isnull=True).exclude(
             fraction__lt=0.5).order_by('-avg_salary')[:10])
 
-    axs[0, 0].barh(i + width / 2, avg_salary, width)
-    axs[0, 0].set_yticks(i + width / 2)
-    axs[0, 0].invert_yaxis()
-    axs[0, 0].set_yticklabels(area_name)
-    axs[0, 0].set_xlabel('Зарплата')
-    for tick in axs[0, 0].get_xticklabels():
+    axs[0].barh(i + width / 2, avg_salary, width)
+    axs[0].set_yticks(i + width / 2)
+    axs[0].invert_yaxis()
+    axs[0].set_yticklabels(area_name)
+    axs[0].set_xlabel('Зарплата')
+    axs[0].tick_params(axis='y', labelsize=8)
+    for tick in axs[0].get_xticklabels():
         tick.set_rotation(45)
-    axs[0, 0].set_title('Средняя зарплата по регионам')
+    axs[0].set_title('Средняя зарплата по регионам')
 
-    avg_salary_f, area_name_f = zip(
-        *vacancies_fullstack.values_list('avg_salary', 'area_name').exclude(salary__isnull=True).exclude(
-            fraction__lt=0.5).order_by(
-            '-avg_salary')[:10])
-
-    axs[1, 0].barh(i + width / 2, avg_salary_f, width)
-    axs[1, 0].set_yticks(i + width / 2)
-    axs[1, 0].invert_yaxis()
-    axs[1, 0].set_yticklabels(area_name_f)
-    axs[1, 0].set_xlabel('Зарплата')
-    for tick in axs[1, 0].get_xticklabels():
-        tick.set_rotation(45)
-    axs[1, 0].set_title('Средняя зарплата по регионам (Fullstack)')
-
-    fraction, area_name = zip(*vacancies.values_list('fraction', 'area_name').order_by('-fraction')[:10])
-    fraction_f, area_name_f = zip(*vacancies_fullstack.values_list('fraction', 'area_name').order_by('-fraction')[:10])
+    fraction, area_name = zip(*vacancies.values_list('fraction', 'area_name').order_by('-fraction')[:9])
     fraction = list(fraction)
     fraction.append(100 - sum(fraction))
     area_name = list(area_name)
     area_name.append('Другие')
-    fraction_f = list(fraction_f)
-    fraction_f.append(100 - sum(fraction_f))
-    area_name_f = list(area_name_f)
-    area_name_f.append('Другие')
 
-    axs[0, 1].pie(fraction, labels=area_name)
-    axs[0, 1].set_title('Доля регионов')
-
-    axs[1, 1].pie(fraction_f, labels=area_name_f)
-    axs[1, 1].set_title('Доля регионов (Fullstack)')
-
+    axs[1].pie(fraction, labels=area_name)
+    axs[1].set_title('Доля регионов')
 
     imgdata = StringIO()
     fig.savefig(imgdata, format='svg')
@@ -97,8 +77,50 @@ def get_data():
 
 @cache_page(60 * 60 * 24)
 def geography(request):
-    vacancies, vacancies_fullstack = get_data()
-    graph = get_graph(vacancies, vacancies_fullstack)
-    return render(request, 'geography.html',
-                  {'graph': graph, 'rating': vacancies.order_by('-fraction')[:10],
-                   'rating_fullstack': vacancies_fullstack.order_by('-fraction')[:10]})
+    regions, regions_fullstack = get_data()
+    content1 = [
+        {'area_name': region['area_name'], 'count': region['count'],
+         'fraction': str(round(region['fraction'], 2)) + '%',
+         'avg_salary': region['avg_salary']} for region in regions.order_by('-fraction')[:10]
+    ]
+    content2 = [
+        {'area_name': region['area_name'], 'count': region['count'],
+         'fraction': str(round(region['fraction'], 2)) + '%',
+         'avg_salary': region['avg_salary']} for region in regions_fullstack.order_by('-fraction')[:10]
+    ]
+    return render(request, 'stats.html',
+                  {
+                      "accordions":
+                          {
+                              "Общая география вакансий":
+                                  [
+                                      {
+                                          'title': 'Таблица',
+                                          'columns': {'area_name': 'Регион', 'count': 'Количество', 'fraction': 'Доля',
+                                                      'avg_salary': 'Средняя зарплата'},
+                                          'type': 'table',
+                                          'content': content1
+                                      },
+                                      {
+                                          'title': 'График',
+                                          'type': 'chart',
+                                          'content': get_graph(regions)
+                                      },
+                                  ],
+                              "География вакансий Fullstack":
+                                  [
+                                      {
+                                          'title': 'Таблица',
+                                          'columns': {'area_name': 'Регион', 'count': 'Количество', 'fraction': 'Доля',
+                                                      'avg_salary': 'Средняя зарплата'},
+                                          'type': 'table',
+                                          'content': content2
+                                      },
+                                      {
+                                          'title': 'График',
+                                          'type': 'chart',
+                                          'content': get_graph(regions_fullstack)
+                                      },
+                                  ]
+                          }
+                  })
