@@ -3,6 +3,9 @@ from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from ulearnProject.utils import get_cbrf_rate
+
+
 def latest(request):
     try:
         session = requests_cache.CachedSession('hh_cache', expire_after=3600)
@@ -20,13 +23,16 @@ def latest(request):
 
 
 def parse_vacancy(vacancy):
-    if vacancy['salary']['from'] is not None and vacancy['salary']['to'] is not None and vacancy['salary']['from'] != \
-            vacancy['salary']['to']:
-        vacancy[
-            'salary'] = f"от {'{0:,}'.format(vacancy['salary']['from']).replace(',', ' ')} до {'{0:,}'.format(vacancy['salary']['to']).replace(',', ' ')} {vacancy['salary']['currency']}"
+    if vacancy['salary']['currency'] != 'RUR':
+        if vacancy['salary']['from'] is not None:
+            vacancy['salary']['from'] = vacancy['salary']['from'] * get_cbrf_rate(vacancy['salary']['currency'], vacancy['published_at'])
+        if vacancy['salary']['to'] is not None:
+            vacancy['salary']['to'] = vacancy['salary']['to'] * get_cbrf_rate(vacancy['salary']['currency'], vacancy['published_at'])
+        vacancy['salary']['currency'] = 'RUR'
+    if vacancy['salary']['from'] is not None and vacancy['salary']['to'] is not None:
+        vacancy['salary'] = f"от {'{0:,}'.format(vacancy['salary']['from']).replace(',', ' ')} до {'{0:,}'.format(vacancy['salary']['to']).replace(',', ' ')} {vacancy['salary']['currency']}"
     elif vacancy['salary']['from'] is not None:
-        vacancy[
-            'salary'] = f"{'{0:,}'.format(vacancy['salary']['from']).replace(',', ' ')} {vacancy['salary']['currency']}"
+        vacancy['salary'] = f"{'{0:,}'.format(vacancy['salary']['from']).replace(',', ' ')} {vacancy['salary']['currency']}"
     elif vacancy['salary']['to'] is not None:
         vacancy[
             'salary'] = f"{'{0:,}'.format(vacancy['salary']['to']).replace(',', ' ')} {vacancy['salary']['currency']}"

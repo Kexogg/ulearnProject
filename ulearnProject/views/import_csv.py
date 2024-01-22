@@ -1,17 +1,16 @@
 import multiprocessing
 import os
 from concurrent.futures import ProcessPoolExecutor
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 
 import pandas as pd
 import re
 import io
 
-import requests_cache
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from ulearnProject import models
-from xml.etree import ElementTree as ET
+from ulearnProject.utils import get_cbrf_rate
 
 if os.name != 'nt':
     multiprocessing.set_start_method('fork')
@@ -29,8 +28,9 @@ def process_row(row):
         else:
             row['salary'] = row['salary_to']
         if row['salary_currency'] != 'RUR':
-            rate = get_cbrf_rate(row['salary_currency'], datetime.strptime(row['published_at'],
-                                                                           '%Y-%m-%dT%H:%M:%S%z'))
+            date = datetime.strptime(row['published_at'], '%Y-%m-%dT%H:%M:%S%z')
+            date = date.replace(day=1)
+            rate = get_cbrf_rate(row['salary_currency'], date)
             if rate is None:
                 row['salary'] = None
             else:
@@ -76,16 +76,3 @@ def import_csv(request):
     return HttpResponse("Invalid request method.")
 
 
-def get_cbrf_rate(currency, date):
-    # BYR -> BYN after 2016-07-01
-    if currency == 'BYR' and date > datetime(2016, 7, 1, tzinfo=timezone(timedelta(hours=0))):
-        currency = 'BYN'
-    session = requests_cache.CachedSession('hh_cache', expire_after=360)
-    response = session.get(f'https://www.cbr.ru/scripts/XML_daily.asp?date_req=01{date.strftime("/%m/%Y")}')
-    response.raise_for_status()
-    tree = ET.fromstring(response.content)
-    for node in tree.findall('Valute'):
-        if node.find('CharCode').text == currency:
-            return float(node.find('VunitRate').text.replace(',', '.'))
-    return None
-    #raise ValueError(f'Currency {currency} not found. Date: {date}')
