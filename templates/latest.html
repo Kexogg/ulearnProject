@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Последние вакансии</h1>
+    <h1>Последние вакансии Fullstack</h1>
     {% for vacancy in vacancies %}
         <article>
             <h2><a href="{{ vacancy.alternate_url }}">{{ vacancy.name }}</a></h2>
@@ -19,7 +19,9 @@
                 <h3>Описание</h3>
                 {{ vacancy.description|safe }}
             </article>
+            {% if vacancy.key_skills|length > 0 %}
             <p><b>Требуемые навыки:</b> {{ vacancy.key_skills }}</p>
+            {% endif %}
         </article>
         <hr />
     {% endfor %}
