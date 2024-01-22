@@ -1,5 +1,104 @@
+from functools import lru_cache
+
+import matplotlib.pyplot as plt
+from io import StringIO
+
+import numpy as np
+from django.db.models import Q
 from django.shortcuts import render
+from django.db import models
+from django.views.decorators.cache import cache_page
+from ulearnProject.models import Vacancy
 
 
+def get_graph(vacancies, vacancies_fullstack):
+    width = 0.35
+    fig, axs = plt.subplots(2, 2)
+    fig.set_figwidth(13)
+    fig.set_figheight(10)
+    fig.subplots_adjust(hspace=0.5)
+    i = np.arange(10)
+    avg_salary, area_name = zip(
+        *vacancies.values_list('avg_salary', 'area_name').exclude(salary__isnull=True).exclude(
+            fraction__lt=0.5).order_by('-avg_salary')[:10])
+
+    axs[0, 0].barh(i + width / 2, avg_salary, width)
+    axs[0, 0].set_yticks(i + width / 2)
+    axs[0, 0].invert_yaxis()
+    axs[0, 0].set_yticklabels(area_name)
+    axs[0, 0].set_xlabel('Зарплата')
+    for tick in axs[0, 0].get_xticklabels():
+        tick.set_rotation(45)
+    axs[0, 0].set_title('Средняя зарплата по регионам')
+
+    avg_salary_f, area_name_f = zip(
+        *vacancies_fullstack.values_list('avg_salary', 'area_name').exclude(salary__isnull=True).exclude(
+            fraction__lt=0.5).order_by(
+            '-avg_salary')[:10])
+
+    axs[1, 0].barh(i + width / 2, avg_salary_f, width)
+    axs[1, 0].set_yticks(i + width / 2)
+    axs[1, 0].invert_yaxis()
+    axs[1, 0].set_yticklabels(area_name_f)
+    axs[1, 0].set_xlabel('Зарплата')
+    for tick in axs[1, 0].get_xticklabels():
+        tick.set_rotation(45)
+    axs[1, 0].set_title('Средняя зарплата по регионам (Fullstack)')
+
+    fraction, area_name = zip(*vacancies.values_list('fraction', 'area_name').order_by('-fraction')[:10])
+    fraction_f, area_name_f = zip(*vacancies_fullstack.values_list('fraction', 'area_name').order_by('-fraction')[:10])
+    fraction = list(fraction)
+    fraction.append(100 - sum(fraction))
+    area_name = list(area_name)
+    area_name.append('Другие')
+    fraction_f = list(fraction_f)
+    fraction_f.append(100 - sum(fraction_f))
+    area_name_f = list(area_name_f)
+    area_name_f.append('Другие')
+
+    axs[0, 1].pie(fraction, labels=area_name)
+    axs[0, 1].set_title('Доля регионов')
+
+    axs[1, 1].pie(fraction_f, labels=area_name_f)
+    axs[1, 1].set_title('Доля регионов (Fullstack)')
+
+
+    imgdata = StringIO()
+    fig.savefig(imgdata, format='svg')
+    imgdata.seek(0)
+    data = imgdata.getvalue()
+    return data
+
+
+@lru_cache(maxsize=None)
+def get_data():
+    vacancies_fullstack = Vacancy.objects.filter(
+        Q(name__icontains='fullstack') |
+        Q(name__icontains='фулстак') |
+        Q(name__icontains='фуллтак') |
+        Q(name__icontains='фуллстэк') |
+        Q(name__icontains='фулстэк') |
+        Q(name__icontains='full stack')
+    )
+    vacancies_fullstack = vacancies_fullstack.values('area_name').annotate(
+        count=models.Count('id'),
+        fraction=(models.Count('id') / float(vacancies_fullstack.count())) * 100,
+        avg_salary=models.Avg('salary', output_field=models.IntegerField()),
+    ).exclude(salary__gt=10000000)
+
+    vacancies = Vacancy.objects.values('area_name').annotate(
+        count=models.Count('id'),
+        fraction=(models.Count('id') / float(Vacancy.objects.count())) * 100,
+        avg_salary=models.Avg('salary', output_field=models.IntegerField())
+    ).exclude(salary__gt=10000000)
+
+    return vacancies, vacancies_fullstack
+
+
+@cache_page(60 * 15)
 def geography(request):
-    return render(request, 'geography.html', {})
+    vacancies, vacancies_fullstack = get_data()
+    graph = get_graph(vacancies, vacancies_fullstack)
+    return render(request, 'geography.html',
+                  {'graph': graph, 'rating': vacancies.order_by('-fraction')[:10],
+                   'rating_fullstack': vacancies_fullstack.order_by('-fraction')[:10]})

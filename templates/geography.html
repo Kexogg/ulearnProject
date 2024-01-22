@@ -1,9 +1,58 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    География
+    Востребованность
 {% endblock %}
 
 {% block content %}
-    <p>Content</p>
+    <h1>География вакансий FullStack-разработчиков</h1>
+    <h2>География всех вакансий</h2>
+    <div class="table__container">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Город</th>
+                <th>Количество вакансий</th>
+                <th>Средняя зарплата</th>
+                <th>Доля вакансий</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for city in rating %}
+                <tr>
+                    <td>{{ city.area_name }}</td>
+                    <td>{{ city.count }}</td>
+                    <td>{{ city.avg_salary|floatformat:"-1" }}</td>
+                    <td>{{ city.fraction|floatformat:"2" }}%</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <h2>География вакансий FullStack-разработчиков</h2>
+    <div class="table__container">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Регион</th>
+                <th>Количество вакансий</th>
+                <th>Средняя зарплата</th>
+                <th>Доля вакансий</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for city in rating_fullstack %}
+                <tr>
+                    <td>{{ city.area_name }}</td>
+                    <td>{{ city.count }}</td>
+                    <td>{{ city.avg_salary|floatformat:"-1" }}</td>
+                    <td>{{ city.fraction|floatformat:"2" }}%</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="chart__container">
+        {{ graph|safe }}
+    </div>
 {% endblock %}

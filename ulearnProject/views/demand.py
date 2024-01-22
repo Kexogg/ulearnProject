@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import matplotlib.pyplot as plt
 from io import StringIO
 
@@ -37,11 +39,10 @@ def get_graph(vacancies):
     imgdata = StringIO()
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
-    plt.show()
     data = imgdata.getvalue()
     return data
 
-
+@lru_cache(maxsize=None)
 def get_data():
     vacancies = Vacancy.objects.annotate(
         year=ExtractYear('published_at')
@@ -70,12 +71,12 @@ def get_data():
                     Q(name__icontains='фулстак') |
                     Q(name__icontains='фуллтак') |
                     Q(name__icontains='фуллстэк') |
-                    Q(name__icontains='фулстэk') |
+                    Q(name__icontains='фулстэк') |
                     Q(name__icontains='full stack'),
                     then='salary'
                 ),
                 default=None,
-                output_field=DecimalField()
+                output_field=IntegerField()
             )
         )
     ).exclude(salary__gt=10000000).order_by('year')

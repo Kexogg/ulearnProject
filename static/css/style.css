@@ -144,10 +144,10 @@ main {
 
 
 .table__container {
-    width: 100%;
     overflow: scroll;
 }
 .table {
+    margin: 0 auto;
     border-collapse: collapse;
 }
 .table > thead > tr > th, .table > tbody > tr > td {
@@ -167,7 +167,7 @@ main {
 }
 .chart__container {
     width: 100%;
-    height: 400px;
+    height: 700px;
     margin: 0 auto;
 }
 .chart__container > svg {
