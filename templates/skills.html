@@ -1,9 +1,75 @@
 {% extends 'base.html' %}
+{% load dict_filters %}
 
 {% block title %}
     Навыки
 {% endblock %}
 
 {% block content %}
-    <p>Content</p>
+    <h1>Навыки</h1>
+    {% for title, accordion in accordions.items %}
+        <h2>{{ title }}</h2>
+        <div class="accordion">
+            {% for accordionItem in accordion %}
+                <div class="accordion__item hidden">
+                    <div class="accordion__item__header">
+                        <h3>{{ accordionItem.title }}</h3>
+                        <button class="accordion__button">Скрыть/Показать</button>
+                    </div>
+                    <div class="accordion__item__content">
+                        {% if accordionItem.type == 'table_grid' %}
+                            <div class="table__grid">
+                                {% for tableKey, tableValue in accordionItem.content.items %}
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="{{ accordionItem.columns|length }}">{{ tableKey }}</th>
+                                        </tr>
+                                        <tr>
+                                            {% for columnKey, columnValue in accordionItem.columns.items %}
+                                                <th>{{ columnValue }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for value in tableValue %}
+                                            {% for valueItem in value %}
+                                                <tr>
+                                                    {% for columnKey, columnValue in accordionItem.columns.items %}
+                                                        <td>{{ valueItem|get_item:columnKey }}</td>
+                                                    {% endfor %}
+                                                </tr>
+                                            {% endfor %}
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% endfor %}
+                            </div>
+                        {% elif accordionItem.type == 'chart' %}
+                            <div class="chart__container">
+                                {{ accordionItem.content|safe }}
+                            </div>
+                        {% elif accordionItem.type == 'table' %}
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Навык</th>
+                                    <th>Количество</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for key, value in accordionItem.content.items %}
+                                    <tr>
+                                        <td>{{ key }}</td>
+                                        <td>{{ value }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
 {% endblock %}
