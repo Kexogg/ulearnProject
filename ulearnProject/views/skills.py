@@ -88,6 +88,7 @@ def skills(request):
     skills, skills_fullstack = get_data()
     return render(request, 'stats.html',
                   {
+                      "title": "Востребованность навыков",
                       "accordions":
                           {
                               "Топ-20 навыков по годам":

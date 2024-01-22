@@ -5,7 +5,6 @@ import requests_cache
 
 
 def get_cbrf_rate(currency, date):
-    print(date)
     # BYR -> BYN after 2016-07-01
     if currency == 'BYR' and date > datetime(2016, 7, 1, tzinfo=timezone(timedelta(hours=0))):
         currency = 'BYN'

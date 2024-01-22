@@ -98,13 +98,14 @@ def demand(request):
     ]
     return render(request, 'stats.html',
                   {
+                      "title": "Востребованность",
                       "accordions":
                           {
-                              "Общая география вакансий":
+                              "Статистика востребованности вакансий Fullstack относительно всех вакансий":
                                   [
                                       {
                                           'title': 'Таблица',
-                                          'columns': {'count': 'Количество', 'fraction': 'Доля',
+                                          'columns': {'year': 'Год', 'count': 'Количество',
                                                       'avg_salary': 'Средняя зарплата (₽)',
                                                       'count_fullstack': 'Количество Fullstack',
                                                       'fraction_fullstack': 'Доля Fullstack',

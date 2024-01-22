@@ -90,6 +90,7 @@ def geography(request):
     ]
     return render(request, 'stats.html',
                   {
+                      "title": "География вакансий",
                       "accordions":
                           {
                               "Общая география вакансий":
