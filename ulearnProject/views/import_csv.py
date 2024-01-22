@@ -37,7 +37,10 @@ def process_row(row):
                 row['salary'] = row['salary'] * rate
     vacancy_object = models.Vacancy(name=row['name'], area_name=row['area_name'],
                                     salary=row['salary'], published_at=row['published_at'])
-    skills = [skill.strip() for skill in re.split(",|\n", str(row['key_skills']))]
+    if pd.isnull(row['key_skills']):
+        skills = []
+    else:
+        skills = [skill.strip() for skill in re.split(",|\n", str(row['key_skills']))]
     return vacancy_object, skills
 
 
