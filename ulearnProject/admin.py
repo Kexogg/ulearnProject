@@ -26,6 +26,11 @@ class VacancyAdmin(admin.ModelAdmin):
 admin.site.register(models.Vacancy, VacancyAdmin)
 admin.site.register(models.Skill)
 
+admin.site.register(models.GeographyStats)
+admin.site.register(models.DemandStats)
+admin.site.register(models.SkillStats)
+
+
 urlpatterns = [
     path('admin/import_csv/', import_csv, name='import_csv'),
 ]
