@@ -73,6 +73,7 @@ class SkillStats(models.Model):
     count = models.IntegerField('Количество вакансий')
     fraction = models.DecimalField('Доля вакансий с навыком', max_digits=10, decimal_places=2)
     isFullstack = models.BooleanField('Fullstack')
+    average_salary = models.DecimalField('Средняя зарплата', max_digits=10, decimal_places=0)
 
     class Meta:
         verbose_name = 'Статистика по навыкам'
