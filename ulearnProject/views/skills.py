@@ -54,10 +54,10 @@ def skills(request):
     content_all = {}
     content_fullstack = {}
     for year in years:
-        content_all[year] = [{'skill': skill['skill'], 'count': skill['count']} for skill in
-                             skills.filter(year=year, isFullstack=False).values('skill', 'count')]
-        content_fullstack[year] = [{'skill': skill['skill'], 'count': skill['count']} for skill in
-                                   skills.filter(year=year, isFullstack=True).values('skill', 'count')]
+        content_all[year] = [{'skill': skill['skill'], 'count': skill['count'], 'fraction': skill['fraction']} for skill in
+                             skills.filter(year=year, isFullstack=False).values('skill', 'count', 'fraction')]
+        content_fullstack[year] = [{'skill': skill['skill'], 'count': skill['count'], 'fraction': skill['fraction']} for skill in
+                                   skills.filter(year=year, isFullstack=True).values('skill', 'count', 'fraction')]
     return render(request, 'stats.html',
                   {
                       "page": Page.objects.get(path='/skills/'),
@@ -68,7 +68,7 @@ def skills(request):
                                   [
                                       {
                                           'title': 'Таблицы',
-                                          'columns': {'skill': 'Навык', 'count': 'Количество'},
+                                          'columns': {'skill': 'Навык', 'count': 'Количество', 'fraction': 'Доля'},
                                           'type': 'table_grid',
                                           'content': content_all
                                       },
@@ -82,7 +82,7 @@ def skills(request):
                                   [
                                       {
                                           'title': 'Таблицы',
-                                          'columns': {'skill': 'Навык', 'count': 'Количество'},
+                                          'columns': {'skill': 'Навык', 'count': 'Количество', 'fraction': 'Доля'},
                                           'type': 'table_grid',
                                           'content': content_fullstack
                                       },
