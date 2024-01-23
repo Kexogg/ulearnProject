@@ -47,30 +47,47 @@ def get_data():
     return SkillStats.objects.order_by('year').all()
 
 
+def get_content(query):
+    return [{'skill': skill['skill'], 'count': skill['count'],
+             'fraction': skill['fraction'], 'avg_salary': skill['average_salary']} for skill in
+            query[:20].values('skill', 'count', 'fraction', 'average_salary')]
+
+
 @cache_page(60 * 60 * 24)
 def skills(request):
     skills = get_data()
     years = skills.values_list('year', flat=True).distinct()
-    content_all = {}
-    content_fullstack = {}
+    content_all_by_frac = {}
+    content_all_by_salary = {}
+    content_fullstack_by_frac = {}
+    content_fullstack_by_salary = {}
     for year in years:
-        content_all[year] = [{'skill': skill['skill'], 'count': skill['count'], 'fraction': skill['fraction']} for skill in
-                             skills.filter(year=year, isFullstack=False).values('skill', 'count', 'fraction')]
-        content_fullstack[year] = [{'skill': skill['skill'], 'count': skill['count'], 'fraction': skill['fraction']} for skill in
-                                   skills.filter(year=year, isFullstack=True).values('skill', 'count', 'fraction')]
+        content_all_by_frac[year] = get_content(skills.order_by('-fraction').filter(year=year, isFullstack=False))
+        content_all_by_salary[year] = get_content(skills.order_by('-average_salary').filter(year=year, isFullstack=False))
+        content_fullstack_by_frac[year] = get_content(skills.order_by('-fraction').filter(year=year, isFullstack=True))
+        content_fullstack_by_salary[year] = get_content(skills.order_by('-average_salary').filter(year=year, isFullstack=True))
+
     return render(request, 'stats.html',
                   {
                       "page": Page.objects.get(path='/skills/'),
                       "title": "Востребованность навыков",
                       "accordions":
                           {
-                              "Топ-20 навыков по годам":
+                              "Топ-20 навыков всех вакансий по годам":
                                   [
                                       {
-                                          'title': 'Таблицы',
-                                          'columns': {'skill': 'Навык', 'count': 'Количество', 'fraction': 'Доля'},
+                                          'title': 'Статистика по доле вакансий',
+                                          'columns': {'skill': 'Навык', 'count': 'Кол-во', 'fraction': 'Доля',
+                                                      'avg_salary': 'Сред. з/п'},
                                           'type': 'table_grid',
-                                          'content': content_all
+                                          'content': content_all_by_frac
+                                      },
+                                      {
+                                          'title': 'Статистика по средней зарплате',
+                                          'columns': {'skill': 'Навык', 'count': 'Кол-во', 'fraction': 'Доля',
+                                                      'avg_salary': 'Сред. з/п'},
+                                          'type': 'table_grid',
+                                          'content': content_all_by_salary
                                       },
                                       {
                                           'title': 'График',
@@ -81,10 +98,18 @@ def skills(request):
                               "Топ-20 навыков FullStack-вакансий по годам":
                                   [
                                       {
-                                          'title': 'Таблицы',
-                                          'columns': {'skill': 'Навык', 'count': 'Количество', 'fraction': 'Доля'},
+                                          'title': 'Статистика по доле вакансий',
+                                          'columns': {'skill': 'Навык', 'count': 'Кол-во', 'fraction': 'Доля',
+                                                      'avg_salary': 'Сред. з/п'},
                                           'type': 'table_grid',
-                                          'content': content_fullstack
+                                          'content': content_fullstack_by_frac
+                                      },
+                                      {
+                                          'title': 'Статистика по средней зарплате',
+                                          'columns': {'skill': 'Навык', 'count': 'Кол-во', 'fraction': 'Доля',
+                                                      'avg_salary': 'Сред. з/п'},
+                                          'type': 'table_grid',
+                                          'content': content_fullstack_by_salary
                                       },
                                       {
                                           'title': 'График',

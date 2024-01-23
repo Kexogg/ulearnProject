@@ -166,6 +166,10 @@ main {
     text-align: left;
 }
 
+.table > tbody > tr > td {
+    word-break: break-word;
+}
+
 .table > tbody > tr:nth-child(even) {
     background: #f9f9f9;
 }
@@ -176,7 +180,7 @@ main {
 
 .table__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(375px, 1fr));
     gap: 1rem;
     padding: 1rem;
 }

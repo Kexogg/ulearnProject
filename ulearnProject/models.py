@@ -78,6 +78,7 @@ class SkillStats(models.Model):
     class Meta:
         verbose_name = 'Статистика по навыкам'
         verbose_name_plural = 'Статистика по навыкам'
+        unique_together = [['year', 'skill', 'isFullstack']]
 
     def __str__(self):
         return f'{self.skill}, {self.count}, {self.isFullstack}, {self.year}'

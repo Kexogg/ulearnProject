@@ -24,8 +24,8 @@ fullstack_query_join = Q(vacancy__name__icontains='fullstack') | \
 
 def create_stats(request):
     if request.method == "POST":
-        #create_geo_stats()
-        #create_demand_stats()
+        create_geo_stats()
+        create_demand_stats()
         create_skills_stats()
         return redirect("..")
     return HttpResponse("Invalid request method.")
@@ -134,26 +134,32 @@ def create_skills_stats():
                                     avg_salary=models.Avg(
                                         Case(When(
                                             vacancy__salary__lte=SALARY_MAX,
+                                            vacancy__salary__isnull=False,
                                             then='vacancy__salary'),
                                             default=None,
                                             output_field=models.IntegerField())),
                                     fraction=Count('skill') / float(
                                         VacancySkill.objects.filter(vacancy__published_at__year=year).count()) * 100.0
-                                    ) \
-                          .order_by('-skill_count')[:20]
+                                    ).exclude(avg_salary=None)
         if len(skills_year) == 0:
             continue
         else:
+            queries = [
+                skills_year.order_by('-skill_count')[:20],
+                skills_year.exclude(fraction__lt=0.7).order_by('-avg_salary')[:20]
+            ]
             skills[year] = {}
-        for skill in skills_year:
-            skills[year][skill['skill__name']] = {'count': skill['skill_count'], 'fraction': skill['fraction'],
-                                                  'avg_salary': skill['avg_salary']}
+        for query in queries:
+            for skill in query:
+                skills[year][skill['skill__name']] = {'count': skill['skill_count'], 'fraction': skill['fraction'],
+                                                      'avg_salary': skill['avg_salary']}
         skills_fullstack_year = VacancySkill.objects.filter(fullstack_query_join, vacancy__published_at__year=year) \
                                     .values('skill__name') \
                                     .annotate(skill_count=Count('skill'),
                                               avg_salary=models.Avg(
                                                   Case(When(
                                                       vacancy__salary__lte=SALARY_MAX,
+                                                      vacancy__salary__isnull=False,
                                                       then='vacancy__salary'),
                                                       default=None,
                                                       output_field=models.IntegerField())),
@@ -161,18 +167,22 @@ def create_skills_stats():
                                                   VacancySkill.objects.filter(fullstack_query_join,
                                                                               vacancy__published_at__year=year).count()) * 100.0
 
-                                              ) \
-                                    .order_by('-skill_count')[:20]
+                                              ).exclude(avg_salary=None)
         if len(skills_fullstack_year) == 0:
             continue
         else:
+            queries = [
+                skills_fullstack_year.order_by('-skill_count')[:20],
+                skills_fullstack_year.exclude(fraction__lt=0.7).order_by('-avg_salary')[:20]
+            ]
             skills_fullstack[year] = {}
-        for skill in skills_fullstack_year:
-            if year not in skills:
-                skills_fullstack[year] = {}
-            skills_fullstack[year][skill['skill__name']] = {'count': skill['skill_count'],
-                                                            'fraction': skill['fraction'],
-                                                            'avg_salary': skill['avg_salary']}
+        for query in queries:
+            for skill in query:
+                if year not in skills:
+                    skills_fullstack[year] = {}
+                skills_fullstack[year][skill['skill__name']] = {'count': skill['skill_count'],
+                                                                'fraction': skill['fraction'],
+                                                                'avg_salary': skill['avg_salary']}
 
     SkillStats.objects.all().delete()
     SkillStats.objects.bulk_create(
