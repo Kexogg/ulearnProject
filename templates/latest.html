@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Последние вакансии
+    {{ page.name }}
 {% endblock %}
 
 {% block content %}
-    <h1>Последние вакансии Fullstack</h1>
+    <h1>{{ page.name }}</h1>
+    {{ page.content|safe }}
     {% for vacancy in vacancies %}
         <article>
             <h2><a href="{{ vacancy.alternate_url }}">{{ vacancy.name }}</a></h2>

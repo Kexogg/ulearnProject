@@ -2,11 +2,12 @@
 {% load dict_filters %}
 
 {% block title %}
-    Навыки
+    {{ page.name }}
 {% endblock %}
 
 {% block content %}
-    <h1>Навыки</h1>
+    <h1>{{ page.name }}</h1>
+    {{ page.content|safe }}
     {% for title, accordion in accordions.items %}
         <h2>{{ title }}</h2>
         <div class="accordion">

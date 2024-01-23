@@ -6,3 +6,4 @@ requests_cache==1.1.1
 pandas~=2.1.4
 matplotlib~=3.8.2
 numpy~=1.26.3
+django-ckeditor~=6.7.0

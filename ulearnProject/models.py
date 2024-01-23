@@ -1,5 +1,5 @@
 from django.db import models
-
+from ckeditor.fields import RichTextField
 
 class Skill(models.Model):
     name = models.CharField('Название навыка', max_length=100, unique=True)
@@ -80,3 +80,16 @@ class SkillStats(models.Model):
 
     def __str__(self):
         return f'{self.skill}, {self.count}, {self.isFullstack}, {self.year}'
+
+
+class Page(models.Model):
+    name = models.CharField('Название страницы', max_length=100, unique=True)
+    path = models.CharField('Путь', max_length=100, unique=True)
+    content = RichTextField('Содержимое страницы')
+    
+    class Meta:
+        verbose_name = 'Страница'
+        verbose_name_plural = 'Страницы'
+
+    def __str__(self):
+        return self.name

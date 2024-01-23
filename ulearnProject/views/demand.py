@@ -4,7 +4,7 @@ import numpy as np
 from django.shortcuts import render
 from django.views.decorators.cache import cache_page
 
-from ulearnProject.models import DemandStats
+from ulearnProject.models import DemandStats, Page
 
 
 def get_graph(stats):
@@ -58,6 +58,7 @@ def demand(request):
     ]
     return render(request, 'stats.html',
                   {
+                      "page": Page.objects.get(path='/demand/'),
                       "title": "Востребованность",
                       "accordions":
                           {

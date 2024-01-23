@@ -29,6 +29,7 @@ admin.site.register(models.Skill)
 admin.site.register(models.GeographyStats)
 admin.site.register(models.DemandStats)
 admin.site.register(models.SkillStats)
+admin.site.register(models.Page)
 
 
 urlpatterns = [

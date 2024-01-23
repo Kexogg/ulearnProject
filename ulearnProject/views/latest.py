@@ -3,6 +3,7 @@ from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from ulearnProject.models import Page
 from ulearnProject.utils import get_cbrf_rate
 
 
@@ -16,7 +17,8 @@ def latest(request):
         for index, vacancy in enumerate(data['items']):
             vacancies[index] = parse_vacancy(session.get(f'https://api.hh.ru/vacancies/{vacancy["id"]}').json())
         return render(request, 'latest.html',
-                      {'vacancies': vacancies.values()})
+                      {"page": Page.objects.get(path='/latest/'),
+                       'vacancies': vacancies.values()})
     except Exception as e:
         print(e)
         return HttpResponse(status=500, content=f'Error: {e}')
@@ -26,14 +28,18 @@ def parse_vacancy(vacancy):
     vacancy['published_at'] = datetime.strptime(vacancy['published_at'], '%Y-%m-%dT%H:%M:%S%z')
     if vacancy['salary']['currency'] != 'RUR':
         if vacancy['salary']['from'] is not None:
-            vacancy['salary']['from'] = int(vacancy['salary']['from'] * get_cbrf_rate(vacancy['salary']['currency'], vacancy['published_at']))
+            vacancy['salary']['from'] = int(
+                vacancy['salary']['from'] * get_cbrf_rate(vacancy['salary']['currency'], vacancy['published_at']))
         if vacancy['salary']['to'] is not None:
-            vacancy['salary']['to'] = int(vacancy['salary']['to'] * get_cbrf_rate(vacancy['salary']['currency'], vacancy['published_at']))
+            vacancy['salary']['to'] = int(
+                vacancy['salary']['to'] * get_cbrf_rate(vacancy['salary']['currency'], vacancy['published_at']))
         vacancy['salary']['currency'] = 'RUR'
     if vacancy['salary']['from'] is not None and vacancy['salary']['to'] is not None:
-        vacancy['salary'] = f"от {'{0:,}'.format(vacancy['salary']['from']).replace(',', ' ')} до {'{0:,}'.format(vacancy['salary']['to']).replace(',', ' ')} {vacancy['salary']['currency']}"
+        vacancy[
+            'salary'] = f"от {'{0:,}'.format(vacancy['salary']['from']).replace(',', ' ')} до {'{0:,}'.format(vacancy['salary']['to']).replace(',', ' ')} {vacancy['salary']['currency']}"
     elif vacancy['salary']['from'] is not None:
-        vacancy['salary'] = f"{'{0:,}'.format(vacancy['salary']['from']).replace(',', ' ')} {vacancy['salary']['currency']}"
+        vacancy[
+            'salary'] = f"{'{0:,}'.format(vacancy['salary']['from']).replace(',', ' ')} {vacancy['salary']['currency']}"
     elif vacancy['salary']['to'] is not None:
         vacancy[
             'salary'] = f"{'{0:,}'.format(vacancy['salary']['to']).replace(',', ' ')} {vacancy['salary']['currency']}"

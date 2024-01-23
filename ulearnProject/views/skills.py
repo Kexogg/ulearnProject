@@ -5,7 +5,7 @@ import numpy as np
 from django.shortcuts import render
 from django.views.decorators.cache import cache_page
 
-from ulearnProject.models import SkillStats
+from ulearnProject.models import SkillStats, Page
 
 
 def get_graph(skills):
@@ -60,6 +60,7 @@ def skills(request):
                                    skills.filter(year=year, isFullstack=True).values('skill', 'count')]
     return render(request, 'stats.html',
                   {
+                      "page": Page.objects.get(path='/skills/'),
                       "title": "Востребованность навыков",
                       "accordions":
                           {
