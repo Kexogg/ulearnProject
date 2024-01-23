@@ -44,7 +44,7 @@ def get_graph(skills):
 
 
 def get_data():
-    return SkillStats.objects.all()
+    return SkillStats.objects.order_by('year').all()
 
 
 @cache_page(60 * 60 * 24)
