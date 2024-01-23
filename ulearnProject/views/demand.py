@@ -8,7 +8,7 @@ from ulearnProject.models import DemandStats
 
 
 def get_graph(stats):
-    width = 0.35
+    width = 0.4
     fig, axs = plt.subplots(2)
     fig.subplots_adjust(hspace=0.5)
     i = np.arange(len(stats))
@@ -17,21 +17,23 @@ def get_graph(stats):
                stat.average_salary_fullstack
                ) for stat in
               stats]))
-    axs[0].bar(i + width / 2, counts, width, label='Все вакансии')
-    axs[0].bar(i - width / 2, counts_fullstack, width, label='Fullstack вакансии')
+    axs[0].bar(i, counts, width, label='Все вакансии')
+    axs[0].bar(i + width, counts_fullstack, width, label='Fullstack вакансии')
     axs[0].set_xticks(i + width / 2)
     axs[0].set_xticklabels(years, rotation=45)
     axs[0].legend(fontsize=12)
     axs[0].set_ylabel('Количество вакансий')
     axs[0].set_title('Вакансии по годам')
+    axs[0].grid(True)
 
-    axs[1].bar(i + width / 2, avg_salaries, width, label='Все вакансии')
-    axs[1].bar(i - width / 2, avg_salaries_fullstack, width, label='Fullstack вакансии')
+    axs[1].bar(i, avg_salaries, width, label='Все вакансии')
+    axs[1].bar(i + width, avg_salaries_fullstack, width, label='Fullstack вакансии')
     axs[1].set_xticks(i + width / 2)
     axs[1].set_xticklabels(years, rotation=45)
     axs[1].legend(fontsize=12, loc='upper left')
     axs[1].set_ylabel('Средняя зарплата')
     axs[1].set_title('Средняя зарплата по годам')
+    axs[1].grid(True)
     imgdata = StringIO()
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)

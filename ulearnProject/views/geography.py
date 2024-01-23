@@ -8,7 +8,7 @@ from ulearnProject.models import GeographyStats
 
 
 def get_graph(stats):
-    width = 0.35
+    width = 0.5
     fig, axs = plt.subplots(2)
     fig.set_figwidth(10)
     fig.set_figheight(10)
@@ -29,6 +29,7 @@ def get_graph(stats):
     for tick in axs[0].get_xticklabels():
         tick.set_rotation(45)
     axs[0].set_title('Средняя зарплата по регионам')
+    axs[0].grid(True)
 
     stats.sort(key=lambda x: x['fraction'], reverse=True)
     fraction, area_name = (

@@ -9,7 +9,7 @@ from ulearnProject.models import SkillStats
 
 
 def get_graph(skills):
-    width = 0.35
+    width = 0.5
     sqrt_len_skills = math.sqrt(skills.values('year').distinct().count())
     if sqrt_len_skills.is_integer():
         rows = cols = int(sqrt_len_skills)
@@ -18,23 +18,24 @@ def get_graph(skills):
         cols = rows + 1
     fig, axs = plt.subplots(rows, cols)
     fig.set_figwidth(15)
-    fig.set_figheight(15)
+    fig.set_figheight(10)
+    fig.subplots_adjust(wspace=0.75)
     fig.subplots_adjust(hspace=0.5)
-    fig.subplots_adjust(wspace=0.5)
     fig.suptitle('Востребованность навыков', fontsize=24)
     years = skills.values_list('year', flat=True).distinct()
     for i, year in enumerate(years):
         x = np.arange(skills.filter(year=year).count())
         y = np.array(skills.filter(year=year).values_list('count', flat=True))
-        axs[i // cols, i % cols].bar(x, y, width)
+        axs[i // cols, i % cols].barh(x, y, width)
         axs[i // cols, i % cols].set_title(year)
-        axs[i // cols, i % cols].set_xticks(x)
-        axs[i // cols, i % cols].set_xticklabels(skills.filter(year=year).values_list('skill', flat=True),
-                                                 rotation=90)
-        axs[i // cols, i % cols].set_ylabel('Упоминания')
-        axs[i // cols, i % cols].set_xlabel('Навык')
-        axs[i // cols, i % cols].set_ylim([0, max(y) * 1.2])
+        axs[i // cols, i % cols].set_yticks(x)
+        axs[i // cols, i % cols].set_yticklabels(
+            [skill[:17] + '...' if len(skill) > 20 else skill for skill in
+             skills.filter(year=year).values_list('skill', flat=True)], fontsize=8)
+        axs[i // cols, i % cols].set_xlabel('Упоминания')
+        axs[i // cols, i % cols].set_xlim([0, max(y) * 1.2])
         axs[i // cols, i % cols].grid(True)
+        axs[i // cols, i % cols].invert_yaxis()
     imgdata = StringIO()
     fig.savefig(imgdata, format='svg')
     imgdata.seek(0)
