@@ -1,28 +1,24 @@
-from functools import lru_cache
-
 import matplotlib.pyplot as plt
 from io import StringIO
 
 import numpy as np
-from django.db.models import Q
 from django.shortcuts import render
-from django.db import models
 from django.views.decorators.cache import cache_page
-from ulearnProject.models import Vacancy
+from ulearnProject.models import GeographyStats
 
 
-@lru_cache(maxsize=None)
-def get_graph(vacancies):
+def get_graph(stats):
     width = 0.35
     fig, axs = plt.subplots(2)
     fig.set_figwidth(10)
     fig.set_figheight(10)
     fig.subplots_adjust(hspace=0.5)
-    # fig.subplots_adjust(wspace=0.5)
     i = np.arange(10)
-    avg_salary, area_name = zip(
-        *vacancies.values_list('avg_salary', 'area_name').exclude(salary__isnull=True).exclude(
-            fraction__lt=0.5).order_by('-avg_salary')[:10])
+
+    stats.sort(key=lambda x: x['avg_salary'], reverse=True)
+    avg_salary, area_name = (
+        zip(*[(region['avg_salary'], region['area_name']) for region in
+              stats[:10]]))
 
     axs[0].barh(i + width / 2, avg_salary, width)
     axs[0].set_yticks(i + width / 2)
@@ -34,7 +30,11 @@ def get_graph(vacancies):
         tick.set_rotation(45)
     axs[0].set_title('Средняя зарплата по регионам')
 
-    fraction, area_name = zip(*vacancies.values_list('fraction', 'area_name').order_by('-fraction')[:9])
+    stats.sort(key=lambda x: x['fraction'], reverse=True)
+    fraction, area_name = (
+        zip(*[(region['fraction'], region['area_name']) for region in
+              stats[:9]]))
+
     fraction = list(fraction)
     fraction.append(100 - sum(fraction))
     area_name = list(area_name)
@@ -50,43 +50,22 @@ def get_graph(vacancies):
     return data
 
 
-@lru_cache(maxsize=None)
 def get_data():
-    vacancies_fullstack = Vacancy.objects.filter(
-        Q(name__icontains='fullstack') |
-        Q(name__icontains='фулстак') |
-        Q(name__icontains='фуллтак') |
-        Q(name__icontains='фуллстэк') |
-        Q(name__icontains='фулстэк') |
-        Q(name__icontains='full stack')
-    )
-    vacancies_fullstack = vacancies_fullstack.values('area_name').annotate(
-        count=models.Count('id'),
-        fraction=(models.Count('id') / float(vacancies_fullstack.count())) * 100,
-        avg_salary=models.Avg('salary', output_field=models.IntegerField()),
-    ).exclude(salary__gt=10000000)
-
-    vacancies = Vacancy.objects.values('area_name').annotate(
-        count=models.Count('id'),
-        fraction=(models.Count('id') / float(Vacancy.objects.count())) * 100,
-        avg_salary=models.Avg('salary', output_field=models.IntegerField())
-    ).exclude(salary__gt=10000000)
-
-    return vacancies, vacancies_fullstack
+    return GeographyStats.objects.all()
 
 
 @cache_page(60 * 60 * 24)
 def geography(request):
-    regions, regions_fullstack = get_data()
+    stats = get_data()
     content1 = [
-        {'area_name': region['area_name'], 'count': region['count'],
-         'fraction': str(round(region['fraction'], 2)) + '%',
-         'avg_salary': region['avg_salary']} for region in regions.order_by('-fraction')[:10]
+        {'area_name': region.area_name, 'count': region.count,
+         'fraction': round(region.fraction, 2),
+         'avg_salary': region.average_salary} for region in stats.order_by('-fraction')[:10]
     ]
     content2 = [
-        {'area_name': region['area_name'], 'count': region['count'],
-         'fraction': str(round(region['fraction'], 2)) + '%',
-         'avg_salary': region['avg_salary']} for region in regions_fullstack.order_by('-fraction')[:10]
+        {'area_name': region.area_name, 'count': region.count_fullstack,
+         'fraction': round(region.fraction_fullstack, 2),
+         'avg_salary': region.average_salary_fullstack} for region in stats.order_by('-fraction_fullstack')[:10]
     ]
     return render(request, 'stats.html',
                   {
@@ -105,7 +84,7 @@ def geography(request):
                                       {
                                           'title': 'График',
                                           'type': 'chart',
-                                          'content': get_graph(regions)
+                                          'content': get_graph(content1)
                                       },
                                   ],
                               "География вакансий Fullstack":
@@ -120,7 +99,7 @@ def geography(request):
                                       {
                                           'title': 'График',
                                           'type': 'chart',
-                                          'content': get_graph(regions_fullstack)
+                                          'content': get_graph(content2)
                                       },
                                   ]
                           }

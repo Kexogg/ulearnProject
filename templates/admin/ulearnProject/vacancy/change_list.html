@@ -9,5 +9,11 @@
             <input type="submit" value="Upload CSV" class="btn btn-primary">
         </form>
     </li>
+    <li>
+        <form action="{% url 'ulearnProject_vacancy_create_stats' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="submit" value="Create stats" class="btn btn-primary">
+        </form>
+    </li>
     {{ block.super }}
 {% endblock %}

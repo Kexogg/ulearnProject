@@ -33,13 +33,11 @@
                                         </thead>
                                         <tbody>
                                         {% for value in tableValue %}
-                                            {% for valueItem in value %}
-                                                <tr>
-                                                    {% for columnKey, columnValue in accordionItem.columns.items %}
-                                                        <td>{{ valueItem|get_item:columnKey }}</td>
-                                                    {% endfor %}
-                                                </tr>
-                                            {% endfor %}
+                                            <tr>
+                                                {% for columnKey, columnValue in accordionItem.columns.items %}
+                                                    <td>{{ value|get_item:columnKey }}</td>
+                                                {% endfor %}
+                                            </tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>
