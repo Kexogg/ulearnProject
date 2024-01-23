@@ -14,7 +14,7 @@
             <b>Регион: {{ vacancy.area.name }}</b>
             <p>Работодатель: <a class="link__highlight" href="{{ vacancy.employer.alternate_url }}">{{ vacancy.employer.name }}</a></p>
             <p>Вакансия создана
-                <time datetime="{{ vacancy.published_at.isoformat }}">{{ vacancy.published_at.day }}.{{ vacancy.published_at.month }}.{{ vacancy.published_at.year }}</time>
+                <time datetime="{{ vacancy.published_at.isoformat }}">{{ vacancy.published_at.hour }}:{{ vacancy.published_at.minute }} {{ vacancy.published_at.day }}.{{ vacancy.published_at.month }}.{{ vacancy.published_at.year }}</time>
             </p>
             <article>
                 <h3>Описание</h3>
